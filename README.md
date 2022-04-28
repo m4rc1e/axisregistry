@@ -1,67 +1,49 @@
-[![CI Status](https://github.com/google/fonts/workflows/Continuous%20Test/badge.svg?branch=main)](https://github.com/google/fonts/actions/workflows/ci.yml?query=workflow%3ATest+branch%3Amain)
+# AxisRegistry Python Module
 
+This repository contains a python package providing easy access to the GF Axis Registry. Data was copied (and is kept is sync with) its original location at the `axisregistry` directory on the [`google/fonts`](https://github.com/google/fonts) git repo.
 
-# Google Fonts Files
+As of March 4th, 2022, there's an ongoing plan to soon make this module the central place for updates on the data-set.
 
-This project mainly contains the binary font files served by Google Fonts ([fonts.google.com](https://fonts.google.com))
+## GF Axis Registry
 
-The top-level directories indicate the license of all files found within them.
-Subdirectories are named according to the family name of the fonts within.
+This package contains a collection of metadata source files that collectively form the Google Fonts Axis Registry.
 
-Each family subdirectory contains the `.ttf` font files served by Google Fonts, plus a `METADATA.pb` file with metadata for the family (such as information on the project designer(s), genre category, and license - [learn more](https://github.com/googlefonts/gf-docs/tree/master/METADATA)) and a `DESCRIPTION.en_us.html` with a description of the family in US English.
+The live Axis Registry is at [fonts.google.com/variablefonts](https://fonts.google.com/variablefonts), and axis definitions are only final when they appear on that page.
 
-The `/catalog` subdirectory contains additional metadata, such as profile texts and portrait/avatar images of font designers, and this is open for contributions and corrections from anyone via Github.
+When the registry is updated here, a line like `axisregistry/axis_name.textproto` should be added to the `to_sandbox.txt` file.
 
-The `/axisregistry` subdirectory contains metadata for the GF Axis Registry, containing information on variable font axes that can be found in the collection, including experimental axes.
+## Axis Metadata Fields
 
-## Bug Reports and Improvement Requests
+*   `tag`
+    *   Tag for the axis used to specify an axis in `font-variation-settings` and CSS API requests.
+*   `display_name`
+    *   Readable name for the axis, generally the expanded form of `tag`.
+*   `min_value`
+    *   Lower bound of the axis. Inclusive.
+*   `max_value`
+    *   Upper bound of the axis. Inclusive.
+*   `default_value`
+    *   Default position of the aixs.
+*   `precision`
+    *   Describes the specificity at which an axis position can be specified.
+        For example, `0` means values must be specified as whole numbers while `-1` means values can be as precise as one decimal place.
+*   `fallback` (repeated)
+    *   Instance positions along the axis, such as wght 100,200,300,400,500,600,700,800,900.
+    *   A cross-product of fallback positions along all supported axes is created to support legacy browsers that lack variable font support.
+        For axes with CSS3 properties (such as [font-weight](https://drafts.csswg.org/css-fonts-3/#font-weight-prop)), the positions accessible
+        to CSS3 should be specified. For axes lacking CSS3 properties a legacy browser is limited to a single position and that position must
+        be at a fallback.
+*   `fallback_only`
+    *   Describes whether to only use fallback values when presenting to users.
+*   `description`
+    *   A description of the axis.
 
-If you find a problem with a font file or have a request for the future development of a font project, please [create a new issue in this project's issue tracker](https://github.com/google/fonts/issues).
+## Why does Google Fonts have its own Axis Registry?
 
-## Contributor Code of Conduct
+We support a superset of the [OpenType axis registry](https://docs.microsoft.com/en-us/typography/opentype/spec/dvaraxisreg) axis set, and use additional metadata for each axis.
+Axes present in a font file but not in this registry will not function via our API.
+No variable font is expected to support all of the axes here.
 
-However you choose to contribute, please abide by our [code of conduct](CODE_OF_CONDUCT.md) to keep our community a healthy and welcoming place.
-
-## Self Host Fonts Available From Google Fonts
-
-Since all the fonts available here are licensed with permission to redistribute, subject to the license terms, you can self-host using a variety of third-party projects.
-
-One popular service is [Fontsource](https://github.com/fontsource/fontsource), which offers bundled NPM packages.
-
-## Local installation package managers
-
-For Linux, macOS, FreeBSD, or HaikuOS you can also use [fnt](https://github.com/alexmyczko/fnt), to install single fonts. For [RPM](http://bootes.ethz.ch/fonts/rpm/), [DEB](http://bootes.ethz.ch/fonts/deb/) based systems, feel free to try the linked URLs for individual fonts. Others can also use the [webservice](http://bootes.ethz.ch/fonts/).
-
-## Download All Google Fonts
-
-You can download all Google Fonts in a simple ZIP snapshot (over 600MB) from <https://github.com/google/fonts/archive/main.zip>
-
-#### Sync With Git
-
-You can also sync the collection with git so that you can update by only fetching what has changed. To learn how to use git, Github provides [illustrated guides](https://guides.github.com) and a [youtube channel](https://www.youtube.com/user/GitHubGuides), and an [interactive learning lab](https://lab.github.com).
-Free, open-source git applications are available for [Windows](https://git-scm.com/download/gui/windows) and [Mac OS X](https://git-scm.com/download/gui/mac).
-
-## License
-
-It is important to always read the license for every font that you use.
-Each font family directory contains the appropriate license file for the fonts in that directory.
-The fonts files themselves also contain licensing and authorship metadata.
-
-Most of the fonts in the collection use the SIL Open Font License, v1.1.
-Some fonts use the Apache 2 license.
-The Ubuntu fonts use the Ubuntu Font License v1.0.
-
-The SIL Open Font License has an option for copyright holders to include a Reserved Font Name requirement, and this option is used with some of the fonts.
-If you modify those fonts, please take care of this important detail.
-
-## Source Files
-
-Source files for each family are often available from the designer, or from [github.com/googlefonts](https://github.com/googlefonts)
-
-These fonts are usually the result of collaborative projects, where you are invited to discuss issues with the designers and even contribute to their ongoing development.
-
-When customizing or remixing fonts, please do contact the designers to understand what they might need in order to include your improvements.
-
-Most of all: Enjoy the fonts!
-
-– The Google Fonts team
+Any font foundry or distributor library that offers variable fonts has a implicit, latent, de-facto axis registry, which can be extracted by scanning the library for axes' tags, labels, and min/def/max values.
+While in 2016 Microsoft originally offered to include more axes in the OpenType 1.8 specification ([github.com/microsoft/OpenTypeDesignVariationAxisTags](https://github.com/microsoft/OpenTypeDesignVariationAxisTags)), as of August 2020, this effort has stalled.
+We hope more foundries and distributors will publish documents like this that make their axes explicit, to encourage of adoption of variable fonts throughout the industry, and provide source material for a future update to the OpenType specification's axis registry.
