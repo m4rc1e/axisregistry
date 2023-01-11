@@ -10,7 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
       matrix:
         python-version: [3.7, 3.8, 3.9]
 
@@ -23,7 +22,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install tox tox-gh-actions pytest
+        pip install --upgrade setuptools
+        pip install tox pytest
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
 
     - name: Test with tox
       run: |
