@@ -26,6 +26,9 @@ jobs:
         pip install --upgrade setuptools
         pip install tox==4.0.12 tox-gh-actions pytest
 
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
     - name: Test with tox
       run: |
         tox -e py
